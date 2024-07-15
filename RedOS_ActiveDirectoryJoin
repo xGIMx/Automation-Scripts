@@ -2,7 +2,7 @@
 sleep 120
 v_domain="<domain>"
 v_admin="<user>"
-v_pass_admin="<passwor>"
+v_pass_admin="<password>"
 v_name_pc=$(date +"%Y%m%d%H%M%S")
 export v_domain v_admin v_pass_admin v_name_pc
 join-to-domain.sh --sk -w -y
