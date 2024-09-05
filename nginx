@@ -1,0 +1,9 @@
+sudo docker run -d --name=NginxProxyManager \
+-p 80:80 \
+-p 81:81 \
+-p 443:443 \
+-v /root/docker/nginx/config.json:/app/config/production.json \
+-v /root/docker/nginx/data:/data \
+-v /root/docker/nginx/lets:/etc/letsencrypt \
+--restart always \
+jc21/nginx-proxy-manager
