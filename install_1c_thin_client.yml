@@ -1,0 +1,49 @@
+---
+- name: Установка 1C Thin Client
+  hosts: all
+  become: true
+  vars:
+    thin_client_installer: setup-thin-8.3.24.1667-x86_64.run
+    thin_client_path: /opt/1cv8/x86_64
+    conf_path: /opt/1cv8/x86_64/conf
+    version: 8.3.24.1667
+    nethasp_file: "{{ conf_path }}/nethasp.ini"
+    libstdcpp_path: "{{ thin_client_path }}/{{ version }}/libstdc++.so.6"
+    libstdcpp_backup: "{{ libstdcpp_path }}.old"
+
+  tasks:
+    - name: Копирование инсталлятора на удалённый хост
+      copy:
+        src: "{{ thin_client_installer }}"
+        dest: "/tmp/{{ thin_client_installer }}"
+        mode: '0755'
+
+    - name: Установка 1C Thin Client
+      command: "/tmp/{{ thin_client_installer }}"
+      args:
+        creates: "{{ thin_client_path }}/{{ version }}"
+
+    - name: Создание nethasp.ini, если он отсутствует
+      copy:
+        dest: "{{ nethasp_file }}"
+        content: |
+          [NH_COMMON]
+          NH_TCPIP = Enabled
+          [NH_TCPIP]
+          NH_SERVER_ADDR = 172.16.5.216
+        owner: root
+        group: root
+        mode: '0644'
+        force: no  # не перезаписывать, если файл уже есть
+
+    - name: Переименование libstdc++.so.6
+      command: "mv {{ libstdcpp_path }} {{ libstdcpp_backup }}"
+      args:
+        removes: "{{ libstdcpp_path }}"
+      ignore_errors: true  # если файл уже переименован — не падать
+
+    - name: Установка libwebkit2gtk
+      apt:
+        name: libwebkit2gtk-4.0-37
+        state: present
+        update_cache: true
