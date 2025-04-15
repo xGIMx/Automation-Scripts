@@ -1,6 +1,8 @@
 ---
 - name: Установка 1C Thin Client
   hosts: all
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   become: true
   vars:
     thin_client_installer: setup-thin-8.3.24.1667-x86_64.run
